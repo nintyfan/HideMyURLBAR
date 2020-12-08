@@ -1,3 +1,5 @@
+var sl_lach_art_pl_apps_firefox_addon_hide_my_urlbar = true;
+
 browser.menus.create({title: 'Navigation', id: 'Special', contexts: ['page', 'tab']}); 
 
 var tab_id;

@@ -1,11 +1,32 @@
+/*
+ *    HideMyURLBar - a program that reduces space usage by hiding Firefox urlbar
+ *    Copyright (C) 2020 Sławomir Lach <slawek@lach.art.pl>
+ * 
+ *    This program is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ * 
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ * 
+ *    You should have received a copy of the GNU General Public License
+ *    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * 
+ */
+
 
 if (document.documentElement.attachShadow) {
 
+  var box =document.createElement("div");
   var sp_pos = 'bottom';
   let span = document.createElement("span");
   let root = span.attachShadow({ mode: "closed" });
   let div = document.createElement('div');
-  
+
+  //box.style.display = 'none';  
   
   div.innerText = window.location.href;
   root.appendChild(div);
@@ -15,7 +36,7 @@ if (document.documentElement.attachShadow) {
   span.style.position = 'fixed';
   span.style.right = '0';
   span.style.bottom = '0';
-  span.addEventListener('mouseover', function (event) {
+  div.addEventListener('mouseover', function (event) {
   
     if ('bottom' == sp_pos) {
     
@@ -30,6 +51,32 @@ if (document.documentElement.attachShadow) {
       span.style.bottom = '0';
     }
   }, true);
+ // alert(browser.runtime.id);
+  var el = document.createElement('button');
+  el.innerText = '^More';
+  el.style.background = 'green';
+  el.style.fontSize = '150%';
+  el.style.fontWeight = 'bold';
+  root.appendChild(el);
+  root.appendChild(box);
+  el.addEventListener('click', function (event) {
+
+    
+    fetch( browser.extension.getURL('nav.html'))
+    .then(response => {
+      var parser = new DOMParser();
+      response.text().then(text => {
+        var doc = parser.parseFromString(text, 'text/html');
+        box.appendChild(doc.documentElement.cloneNode(true));//page;
+        box.style.display = 'block';
+      });
+    }).catch(error => alert('Error'));
+    //box.innerHTML = page;
+    //box.style.display = 'block'
+   // box.src = 'nav.html';
+//       box.src = browser.extension.getURL('./nav.html');
+ 
+    }, true);
   
   document.documentElement.appendChild(span);
 }
