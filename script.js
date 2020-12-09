@@ -6,7 +6,7 @@ function load_page(uri)
   window.close();
 }
 
-function on_order_page_load(el, event)
+function on_order_page_load(el, event, contentScript)
 {
   
   if (event.keyCode == 13) {
@@ -15,7 +15,7 @@ function on_order_page_load(el, event)
     
       val = 'http://' + val;
     }
-    if (browser.runtime)
+    if (undefined == contentScript)
        load_page(val);
     else
       window.location.href = val;
@@ -25,38 +25,43 @@ function on_order_page_load(el, event)
   return false;
 }
 
-window.addEventListener('load', function (event) {
+function extend(element, contentScript)
+{
+  var document = element;
   document.querySelector("#back_btn").addEventListener('click', function (event) {
-    
-    if ( browser.runtime)
+  
+    if ( undefined == contentScript) {
       browser.runtime.sendMessage({type: 'back'});
+    }
     else
-      window.history.back();
+    {
+      top.history.back();
+    }
     return false;
   }, true);
- 
+  
   document.querySelector("#forward_btn").addEventListener('click', function (event) {
     
-    if (true == sl_lach_art_pl_apps_firefox_addon_hide_my_urlbar)
+    if (undefined == contentScript)
       browser.runtime.sendMessage({type: 'forward'});
     else
-      window.history.forward();
+      top.history.forward();
     return false;
   }, true);
   
   document.querySelector("#refresh_btn").addEventListener('click', function (event) {
-  
-    if (true == sl_lach_art_pl_apps_firefox_addon_hide_my_urlbar)
+    
+    if (undefined == contentScript)
       browser.runtime.sendMessage({type: 'reload'});
     else
-      window.history.reload(true);
+      top.location.reload(true);
     return false;
   }, true);
   document.querySelector("#home_btn").addEventListener('click', function (event) {
     if (true == sl_lach_art_pl_apps_firefox_addon_hide_my_urlbar)
       browser.runtime.sendMessage({type: 'home'});
     else {
-    
+      
       
       var a = browser.browserSettings.homepageOverride.get({}).then(result => {
         console.log(result.value);
@@ -71,8 +76,13 @@ window.addEventListener('load', function (event) {
   }, true);
   document.querySelector("#goto").addEventListener('keyup', function (event) {
     
-    on_order_page_load(this, event);
+    on_order_page_load(this, event, contentScript);
     
     return false;
   }, true);
+}
+
+window.addEventListener('load', function (event) {
+
+   extend(document);  
 }, true);

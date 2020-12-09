@@ -19,8 +19,13 @@ browser.menus.onClicked.addListener( function (info, tab) {
   
 });
 
-browser.runtime.onMessage.addListener(data => {
+browser.runtime.onMessage.addListener(function (data, sender) {
 
+  var tab_id = tab_id;
+  if (sender && sender.tab)
+    tab_id = sender.tab.id;
+  console.log(data);
+  console.log(tab_id);
   var a = null;
   if (data.type === "home") {
     

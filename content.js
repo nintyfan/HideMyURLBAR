@@ -26,6 +26,21 @@ if (document.documentElement.attachShadow) {
   let root = span.attachShadow({ mode: "closed" });
   let div = document.createElement('div');
 
+  /*var url = browser.extension.getURL('/');
+  
+  var head = document.createElement('head');
+  
+  var style = document.createElement('style');
+  style.setAttribute('type', 'text/css');
+  style.setAttribute('href', url + '/style.css');
+  
+  var script = document.createElement('script');
+  script.setAttribute('src', url + '/script.js');
+  
+  head.appendChild(style);
+  head.appendChild(script);
+  root.appendChild(head);
+  */
   //box.style.display = 'none';  
   
   div.innerText = window.location.href;
@@ -67,7 +82,14 @@ if (document.documentElement.attachShadow) {
       var parser = new DOMParser();
       response.text().then(text => {
         var doc = parser.parseFromString(text, 'text/html');
+        //var head = doc.getElementsByTagName('head')[0];
+        //var base = doc.createElement('base');
+        //base.setAttribute('src', browser.extension.getURL('/'));
+        //head.prepend(base);
+        
+        console.log(doc);
         box.appendChild(doc.documentElement.cloneNode(true));//page;
+        extend(root, true);
         box.style.display = 'block';
       });
     }).catch(error => alert('Error'));
@@ -77,6 +99,6 @@ if (document.documentElement.attachShadow) {
 //       box.src = browser.extension.getURL('./nav.html');
  
     }, true);
-  
+  console.log(root);
   document.documentElement.appendChild(span);
 }
