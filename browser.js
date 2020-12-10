@@ -19,26 +19,85 @@ browser.menus.onClicked.addListener( function (info, tab) {
   
 });
 
+function send_home_to_tab(tab_id, value)
+{
+  console.log(tab_id);
+  console.log(value);
+  return browser.tabs.sendMessage(
+    tab_id,
+    {type: 'home', homeURI: value});
+}
+
+function updateHomeURL(value)
+{
+  browser.tabs.query({
+  }).then(tabs => {
+    
+    browser.tabs.query({}).then(tabs => {
+      let promises = []
+      for (let tab of tabs) {
+        promises.push(send_home_to_tab(tab.id, value));
+      }
+      Promise.all(promises);
+      
+      return Promise.resolve(true);
+    });
+  });
+}
+
+var home_uri = null;
+
+function get_home_uri()
+{
+  console.log(home_uri);
+  return home_uri;
+}
+
+browser.browserSettings.homepageOverride.get({}).then(result => {
+  console.log(result.value);
+  var addr = result.value.split("=");
+  addr.shift();
+  addr = addr.join("=");
+  home_uri = addr;
+  
+  updateHomeURL(get_home_uri());
+});
+
+
+browser.webNavigation.onCompleted.addListener(function (object) {
+  
+  send_home_to_tab(object.tabId, get_home_uri());
+});
+
+browser.browserSettings.homepageOverride.onChange.addListener(function (data) {
+
+  var addr = data.value;
+  var addr = addr.value.split("=");
+  addr.shift();
+  addr = addr.join("=");
+  home_uri = addr;
+  updateHomeURL(get_home_uri());
+});
+console.log(home_uri);
 browser.runtime.onMessage.addListener(function (data, sender) {
 
   var tab_id = tab_id;
   if (sender && sender.tab)
     tab_id = sender.tab.id;
-  console.log(data);
-  console.log(tab_id);
+
   var a = null;
-  if (data.type === "home") {
+  if (data.type === "GetHome") {
+  
+
+    send_home_to_tab(tab_id, get_home_uri());
+    return Promise.resolve(get_home_uri());
+  }
+  else if (data.type === "home") {
     
     var a = browser.browserSettings.homepageOverride.get({}).then(result => {
-      console.log(result.value);
-      var addr = result.value.split("=");
-      addr.shift();
-      addr = addr.join("=");
       var a = browser.tabs.executeScript(tab_id, {code:
-      'window.location = "' + addr +'"'});
+      'window.location = "' + home_uri+'"'});
     });
-    //var a = browser.tabs.executeScript(tab_id, {code: 'location.href = "about:home";'});
-    //var a = browser.tabs.executeScript(tab_id, {code: 'window.home();'});
   }
   else if (data.type === "reload") {
     

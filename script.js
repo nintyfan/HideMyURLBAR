@@ -24,10 +24,24 @@ function on_order_page_load(el, event, contentScript)
   
   return false;
 }
+var home_uri;
+
 
 function extend(element, contentScript)
 {
   var document = element;
+  browser.runtime.onMessage.addListener(function (data, sender) {
+
+    if ('home' == data.type) {
+      
+      home_uri = data.homeURI;
+    }
+  });
+  browser.runtime.sendMessage({type: 'GetHome'}).then(message => {
+
+    home_uri = message;
+  }
+  );
   document.querySelector("#back_btn").addEventListener('click', function (event) {
   
     if ( undefined == contentScript) {
@@ -58,20 +72,11 @@ function extend(element, contentScript)
     return false;
   }, true);
   document.querySelector("#home_btn").addEventListener('click', function (event) {
-    if (true == sl_lach_art_pl_apps_firefox_addon_hide_my_urlbar)
-      browser.runtime.sendMessage({type: 'home'});
-    else {
-      
-      
-      var a = browser.browserSettings.homepageOverride.get({}).then(result => {
-        console.log(result.value);
-        var addr = result.value.split("=");
-        addr.shift();
-        addr = addr.join("=");
-        var a = browser.tabs.executeScript(tab_id, {code:
-          'window.location = "' + addr +'"'});
-      });
-    }
+ 
+    if (undefined == contentScript)
+       browser.runtime.sendMessage({type: 'home'});
+    else
+      window.location = home_uri;
     return false;
   }, true);
   document.querySelector("#goto").addEventListener('keyup', function (event) {
@@ -85,4 +90,5 @@ function extend(element, contentScript)
 window.addEventListener('load', function (event) {
 
    extend(document);  
+   
 }, true);

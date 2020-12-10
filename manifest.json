@@ -3,7 +3,7 @@
 	"name": "HideMyNavigation",
 	"version": "0.0.1",
 	"description": "Hides navigation and puts it onto page previews",
-        "permissions": ["tabs", "contextMenus", "menus", "activeTab", "browserSettings"],
+        "permissions": ["tabs", "contextMenus", "menus", "activeTab", "browserSettings", "webNavigation"],
 	"background": {
            "scripts": ["browser.js"]
         },
